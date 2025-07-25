@@ -22,6 +22,5 @@ root_agent = Agent(
         data_analyst_agent,
         trend_researcher_agent,
         strategy_planner_agent,
-
     ],
 )

@@ -1,11 +1,12 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import uvicorn
 import vertexai
 from vertexai.preview import reasoning_engines
 from google.adk.agents import Agent
-from marketer.agent import root_agent as marketer_agent
+from marketer._agent import create_marketer_agent
 
 # Google Cloud 프로젝트 설정
 PROJECT_ID = "geo-project-467010"
@@ -15,6 +16,15 @@ STAGING_BUCKET = "gs://geo-project-adk-staging"
 # FastAPI 앱 생성
 app = FastAPI(title="ADK Agent API")
 
+# CORS 설정
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 실제 운영환경에서는 구체적인 도메인을 지정하세요
+    allow_credentials=True,
+    allow_methods=["*"],  # 필요한 HTTP 메서드만 지정하세요 (예: ["GET", "POST"])
+    allow_headers=["*"],  # 필요한 헤더만 지정하세요
+)
+
 
 # 요청/응답 모델
 class ChatRequest(BaseModel):
@@ -22,29 +32,14 @@ class ChatRequest(BaseModel):
     message: str
     session_id: Optional[str] = None
     instruction: Optional[str] = None
-
+    tools: Optional[list] = []
 
 class ChatResponse(BaseModel):
     session_id: str
     messages: List[dict]
 
 
-# ADK 에이전트 생성
-def create_sample_agent(instruction: str = None):
-    """에이전트를 생성합니다."""
-    if instruction is None:
-        instruction = "사용자의 질문에 친절하게 답변하는 에이전트입니다."
-
-    return Agent(
-        name="sample_agent",
-        model="gemini-2.0-flash",
-        description="전문적이고 친절한 한국어 AI 어시스턴트입니다.",
-        instruction=instruction,
-        tools=[],
-    )
-
-
-@app.post("/api/v1/adk/chat", response_model=ChatResponse)
+@app.post("/api/v1/adk/marketer", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     try:
         vertexai.init(
@@ -53,9 +48,10 @@ async def chat(request: ChatRequest):
             staging_bucket=STAGING_BUCKET,
         )
 
+        # 매 요청마다 새로운 마케터 에이전트 인스턴스 생성
+        agent = create_marketer_agent(request.instruction, request.tools)
         adk_app = reasoning_engines.AdkApp(
-            # agent=marketer_agent,
-            agent=create_sample_agent(request.instruction),
+            agent=agent,
             enable_tracing=True,
         )
 
