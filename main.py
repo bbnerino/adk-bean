@@ -3,10 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import uvicorn
-import vertexai
-from vertexai.preview import reasoning_engines
-from google.adk.agents import Agent
-from marketer._agent import create_marketer_agent
+from marketer.manager import ADKAppManager
 
 # Google Cloud 프로젝트 설정
 PROJECT_ID = "geo-project-467010"
@@ -25,6 +22,12 @@ app.add_middleware(
     allow_headers=["*"],  # 필요한 헤더만 지정하세요
 )
 
+# ADK 앱 매니저 인스턴스 생성
+adk_manager = ADKAppManager(
+    project_id=PROJECT_ID,
+    location=LOCATION,
+    staging_bucket=STAGING_BUCKET,
+)
 
 # 요청/응답 모델
 class ChatRequest(BaseModel):
@@ -38,29 +41,24 @@ class ChatResponse(BaseModel):
     session_id: str
     messages: List[dict]
 
-
 @app.post("/api/v1/adk/marketer", response_model=ChatResponse)
 async def chat(request: ChatRequest):
     try:
-        vertexai.init(
-            project=PROJECT_ID,
-            location=LOCATION,
-            staging_bucket=STAGING_BUCKET,
+        # ADK 앱 가져오기 또는 생성
+        adk_app = adk_manager.get_or_create_app(
+            user_id=request.user_id,
+            instruction=request.instruction,
+            tools=request.tools
         )
 
-        # 매 요청마다 새로운 마케터 에이전트 인스턴스 생성
-        agent = create_marketer_agent(request.instruction, request.tools)
-        adk_app = reasoning_engines.AdkApp(
-            agent=agent,
-            enable_tracing=True,
+        # 세션 가져오기 또는 생성
+        adk_app, session_id = adk_manager.get_or_create_session(
+            user_id=request.user_id,
+            session_id=request.session_id
         )
 
-        # 세션이 없으면 새로 생성
-        if not request.session_id:
-            session = adk_app.create_session(user_id=request.user_id)
-            session_id = session.id
-        else:
-            session_id = request.session_id
+        if not adk_app or not session_id:
+            raise HTTPException(status_code=500, detail="Failed to create or get session")
 
         # 쿼리 실행
         messages = []
@@ -76,11 +74,9 @@ async def chat(request: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
-
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
