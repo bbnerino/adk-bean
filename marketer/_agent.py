@@ -1,12 +1,12 @@
 from google.adk.agents import Agent
 
-import marketer.sub_agents.content_reviewer._agent as content_reviewer
-import marketer.sub_agents.persona_builder._agent as persona_builder
-import marketer.sub_agents.content_writer._agent as content_writer
-import marketer.sub_agents.seo_optimizer._agent as seo_optimizer
-import marketer.sub_agents.data_analyst._agent as data_analyst
-import marketer.sub_agents.trend_researcher._agent as trend_researcher
-import marketer.sub_agents.strategy_planner._agent as strategy_planner
+import marketer.sub_agents.content_reviewer.agent as content_reviewer
+import marketer.sub_agents.persona_builder.agent as persona_builder
+import marketer.sub_agents.content_writer.agent as content_writer
+import marketer.sub_agents.seo_optimizer.agent as seo_optimizer
+import marketer.sub_agents.data_analyst.agent as data_analyst
+import marketer.sub_agents.trend_researcher.agent as trend_researcher
+import marketer.sub_agents.strategy_planner.agent as strategy_planner
 from marketer.prompt import ROOT_AGENT_INSTR
 
 
