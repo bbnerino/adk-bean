@@ -7,7 +7,7 @@ from .prompt import CONTENT_REVIEWER_INSTR
 def create_agent():
     return Agent(
         model="gemini-2.5-flash",
-        name="content_reviewer",
+        name="content_reviewer_agent",
         description="A Content Review Agent for quality assurance",
         instruction=CONTENT_REVIEWER_INSTR,
     )

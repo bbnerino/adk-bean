@@ -22,9 +22,9 @@ def create_marketer_agent(instruction: str = None, tools: list = []):
         description="A Marketing AI using the services of multiple sub-agents",
         instruction=instruction,
         sub_agents=[
+            content_writer.create_agent(),
             content_reviewer.create_agent(),
             persona_builder.create_agent(),
-            content_writer.create_agent(),
             seo_optimizer.create_agent(),
             data_analyst.create_agent(),
             trend_researcher.create_agent(),

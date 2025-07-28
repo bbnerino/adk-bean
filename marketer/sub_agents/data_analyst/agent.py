@@ -7,7 +7,7 @@ from .prompt import DATA_ANALYST_INSTR
 def create_agent():
     return Agent(
         model="gemini-2.5-flash",
-        name="data_analyst",
+        name="data_analyst_agent",
         description="A Data Analysis Agent for marketing insights",
         instruction=DATA_ANALYST_INSTR,
     )

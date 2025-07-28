@@ -7,7 +7,7 @@ from .prompt import STRATEGY_PLANNER_INSTR
 def create_agent():
     return Agent(
         model="gemini-2.5-flash",
-        name="strategy_planner",
+        name="strategy_planner_agent",
         description="A Strategy Planning Agent for marketing campaigns",
         instruction=STRATEGY_PLANNER_INSTR,
     )
