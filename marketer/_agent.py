@@ -11,6 +11,8 @@ from marketer.prompt import ROOT_AGENT_INSTR
 from marketer.utils.tools.patch_content import patch_content
 from marketer.utils.tools.update_content import update_content
 
+from marketer.utils.mcp.file_system import file_system_mcp
+
 
 def create_marketer_agent(instruction: str = None):
     if instruction is None:
@@ -32,5 +34,5 @@ def create_marketer_agent(instruction: str = None):
             trend_researcher.create_agent(),
             strategy_planner.create_agent(),
         ],
-        tools=[update_content, patch_content],
+        tools=[update_content, patch_content, file_system_mcp],
     )
