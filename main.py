@@ -10,12 +10,25 @@ from google.genai import types
 import vertexai
 import os
 from marketer._agent import create_marketer_agent
+import traceback
+
+from marketer.utils.tools.patch_content import patch_content
+from marketer.utils.tools.update_content import update_content
 
 # 환경변수 로드
 load_dotenv()
 
-# session_service = InMemorySessionService()
-db_path = "sqlite:///database/adk-db.sqlite"
+
+
+db_type = "mysql+pymysql"
+db_user = "root"
+db_password = "uneed3515"
+db_host = "localhost"
+db_port = 3306
+db_name = "adk_sessions"
+
+# db_path = "sqlite:///database/adk-db.sqlite"
+db_path = f"{db_type}://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 session_service = DatabaseSessionService(db_path)
 
 APP_NAME = "geo-project"
@@ -48,7 +61,6 @@ class ChatRequest(BaseModel):
     message: str
     session_id: Optional[str] = None
     instruction: Optional[str] = None
-    tools: Optional[list] = []
 
 
 class ChatResponse(BaseModel):
@@ -74,38 +86,63 @@ async def chat(request: ChatRequest):
                 if not session:
                     # 세션이 없으면 새로 생성
                     session = await session_service.create_session(
-                        app_name=APP_NAME,
-                        user_id=request.user_id
+                        app_name=APP_NAME, user_id=request.user_id
                     )
             except Exception as e:
+                print(f"Session error: {str(e)}")
+                print(traceback.format_exc())
                 # 세션 조회/생성 실패 시 새로운 세션 생성
                 session = await session_service.create_session(
-                    app_name=APP_NAME,
-                    user_id=request.user_id
+                    app_name=APP_NAME, user_id=request.user_id
                 )
         else:
             # 세션 ID가 없는 경우 새로운 세션 생성
             session = await session_service.create_session(
-                app_name=APP_NAME,
-                user_id=request.user_id
+                app_name=APP_NAME, user_id=request.user_id
             )
 
         runner.agent.instruction = request.instruction
-        runner.agent.tools = request.tools
 
         content = types.Content(role="user", parts=[types.Part(text=request.message)])
-        events = runner.run(
-            user_id=request.user_id, session_id=session.id, new_message=content
-        )
 
-        # Event 객체를 리스트로 변환
+        # 비동기로 실행
         messages = []
-        for event in events:
-            messages.append(event)
+        try:
+            async for event in runner.run_async(
+                user_id=request.user_id, session_id=session.id, new_message=content
+            ):
+                messages.append(event)
+        except Exception as e:
+            print(f"Runner error: {str(e)}")
+            print(traceback.format_exc())
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "error": str(e),
+                    "type": type(e).__name__,
+                    "traceback": traceback.format_exc(),
+                },
+            )
+
+        if not messages:
+            raise HTTPException(
+                status_code=500, detail="No response generated from the agent"
+            )
 
         return ChatResponse(session_id=session.id, messages=messages)
+    except HTTPException as he:
+        raise he
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Unexpected error: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": str(e),
+                "type": type(e).__name__,
+                "traceback": traceback.format_exc(),
+            },
+        )
 
 
 if __name__ == "__main__":

@@ -8,9 +8,11 @@ import marketer.sub_agents.data_analyst.agent as data_analyst
 import marketer.sub_agents.trend_researcher.agent as trend_researcher
 import marketer.sub_agents.strategy_planner.agent as strategy_planner
 from marketer.prompt import ROOT_AGENT_INSTR
+from marketer.utils.tools.patch_content import patch_content
+from marketer.utils.tools.update_content import update_content
 
 
-def create_marketer_agent(instruction: str = None, tools: list = []):
+def create_marketer_agent(instruction: str = None):
     if instruction is None:
         instruction = ROOT_AGENT_INSTR
     else:
@@ -30,5 +32,5 @@ def create_marketer_agent(instruction: str = None, tools: list = []):
             trend_researcher.create_agent(),
             strategy_planner.create_agent(),
         ],
-        tools=tools,
+        tools=[update_content, patch_content],
     )
