@@ -1,36 +1,18 @@
 from google.adk.sessions.database_session_service import (
-    DatabaseSessionService, 
-    Base,
+    DatabaseSessionService,
     StorageSession,
     StorageEvent,
     StorageAppState,
     StorageUserState
 )
 
-class MarketBase(Base):
-    __abstract__ = True
-    
-class MarketStorageSession(StorageSession):
-    __tablename__ = "market_sessions"
-    
-class MarketStorageEvent(StorageEvent):
-    __tablename__ = "market_events"
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ["app_name", "user_id", "session_id"],
-            ["market_sessions.app_name", "market_sessions.user_id", "market_sessions.id"],
-            ondelete="CASCADE",
-        ),
-    )
-    
-class MarketStorageAppState(StorageAppState):
-    __tablename__ = "market_app_states"
-    
-class MarketStorageUserState(StorageUserState):
-    __tablename__ = "market_user_states"
-
 class MarketDatabaseSessionService(DatabaseSessionService):
     def __init__(self, db_url: str, **kwargs):
-        super().__init__(db_url, **kwargs)
-        # 기존 테이블 대신 새로운 테이블 사용
-        MarketBase.metadata.create_all(self.db_engine) 
+        # 기존 클래스의 테이블 이름을 직접 변경
+        StorageSession.__table__.name = "market_sessions"
+        StorageEvent.__table__.name = "market_events"
+        StorageAppState.__table__.name = "market_app_states"
+        StorageUserState.__table__.name = "market_user_states"
+        
+        # 부모 클래스 초기화
+        super().__init__(db_url, **kwargs) 

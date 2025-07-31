@@ -1,7 +1,6 @@
 from typing import List, Optional, Any
 from dotenv import load_dotenv
 from google.adk.runners import Runner
-from google.adk.sessions import DatabaseSessionService, InMemorySessionService
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -14,6 +13,7 @@ import traceback
 
 from marketer.utils.tools.patch_content import patch_content
 from marketer.utils.tools.update_content import update_content
+from marketer.utils.database.session_service import MarketDatabaseSessionService
 
 # 환경변수 로드
 load_dotenv()
@@ -29,7 +29,7 @@ db_name = "adk_sessions"
 
 # db_path = "sqlite:///database/adk-db.sqlite"
 db_path = f"{db_type}://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
-session_service = DatabaseSessionService(db_path)
+session_service = MarketDatabaseSessionService(db_path)
 
 APP_NAME = "geo-project"
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "geo-project-467010")
