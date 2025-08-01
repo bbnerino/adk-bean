@@ -5,6 +5,12 @@ from marketer.sub_agents.content_writer.agent import content_writer_agent
 from marketer.sub_agents.seo_optimizer.agent import seo_optimizer_agent
 from marketer.sub_agents.strategy_planner.agent import strategy_planner_agent
 from marketer.prompt import ROOT_AGENT_INSTR
+from marketer.utils.mcp.calculate import calculate_mcp
+
+
+tools = [
+    calculate_mcp
+]
 
 root_agent = Agent(
     model="gemini-2.5-flash",
@@ -17,4 +23,5 @@ root_agent = Agent(
         seo_optimizer_agent,
         strategy_planner_agent,
     ],
+    # tools=tools,
 )
