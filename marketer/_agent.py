@@ -1,17 +1,15 @@
 from google.adk.agents import Agent
 
 import marketer.sub_agents.content_reviewer.agent as content_reviewer
-import marketer.sub_agents.persona_builder.agent as persona_builder
 import marketer.sub_agents.content_writer.agent as content_writer
 import marketer.sub_agents.seo_optimizer.agent as seo_optimizer
-import marketer.sub_agents.data_analyst.agent as data_analyst
-import marketer.sub_agents.trend_researcher.agent as trend_researcher
 import marketer.sub_agents.strategy_planner.agent as strategy_planner
 from marketer.prompt import ROOT_AGENT_INSTR
+from marketer.utils.tools.load_web_client import load_web_client
 from marketer.utils.tools.patch_content import patch_content
 from marketer.utils.tools.update_content import update_content
 
-from marketer.utils.mcp.file_system import file_system_mcp
+# from marketer.utils.mcp.file_system import file_system_mcp
 
 
 def create_marketer_agent(instruction: str = None):
@@ -28,11 +26,13 @@ def create_marketer_agent(instruction: str = None):
         sub_agents=[
             content_writer.create_agent(),
             content_reviewer.create_agent(),
-            persona_builder.create_agent(),
             seo_optimizer.create_agent(),
-            data_analyst.create_agent(),
-            trend_researcher.create_agent(),
             strategy_planner.create_agent(),
         ],
-        tools=[update_content, patch_content, file_system_mcp],
+        tools=[
+            update_content,
+            patch_content,
+            # file_system_mcp
+            load_web_client,
+        ],
     )
