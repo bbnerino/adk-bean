@@ -4,5 +4,6 @@ uv install python 3.12
 uv add google-adk
 
 ### adk web
-adk web
+uv run adk web
+
 

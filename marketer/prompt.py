@@ -15,12 +15,10 @@ ROOT_AGENT_INSTR = """
    - MD 형식으로 깔끔하게 결과물만 출력
 
 2. 다른 에이전트 작업:
-   - Strategy Planner: 전략 설명, 방향성 제시, 질문
+   - Strategy Planner: 전략 설명, 방향성 제시, 질문, 계산 도구 사용
    - Trend Researcher: 트렌드 분석, 시장 조사 결과 설명
    - SEO Optimizer: 키워드 제안, 최적화 방안 설명
-   - Data Analyst: 데이터 분석 결과 설명
    - Content Reviewer: 피드백 제공, 개선점 설명
-   - Persona Builder: 타겟 분석 결과 설명
 
 ## 작업 프로세스
 1. Strategy Planner가 사용자의 요구사항을 파악하고 질문합니다
