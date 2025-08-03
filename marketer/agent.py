@@ -8,7 +8,7 @@ from marketer.prompt import ROOT_AGENT_INSTR
 from google.adk.tools.agent_tool import AgentTool
 
 from marketer.utils.mcp.load_web_tool import load_web_tool
-
+from marketer.utils.mcp.payment_agent import payment_agent_tool
 
 root_agent = Agent(
     model="gemini-2.5-flash",
@@ -22,6 +22,7 @@ root_agent = Agent(
         strategy_planner_agent,
     ],
     tools=[
-        load_web_tool
+        load_web_tool,
+        payment_agent_tool
     ],
 )
