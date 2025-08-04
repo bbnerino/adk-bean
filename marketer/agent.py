@@ -30,4 +30,4 @@ def create_marketer_agent():
     )
 
 
-marketer_agent = create_marketer_agent()
+root_agent = create_marketer_agent()

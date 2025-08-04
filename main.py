@@ -10,7 +10,7 @@ import vertexai
 import os
 import traceback
 
-from marketer.agent import marketer_agent
+from marketer.agent import root_agent
 from marketer.utils.tools.patch_content import patch_content
 from marketer.utils.tools.update_content import update_content
 from marketer.utils.database.session_service import MarketDatabaseSessionService
@@ -50,7 +50,7 @@ app.add_middleware(
 
 # Runner 초기화는 vertexai 초기화 후에
 runner = Runner(
-    agent=marketer_agent,
+    agent=root_agent,
     app_name=APP_NAME,
     session_service=session_service,
 )
