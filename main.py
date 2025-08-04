@@ -8,9 +8,9 @@ import uvicorn
 from google.genai import types
 import vertexai
 import os
-from marketer._agent import create_marketer_agent
 import traceback
 
+from marketer.agent import marketer_agent
 from marketer.utils.tools.patch_content import patch_content
 from marketer.utils.tools.update_content import update_content
 from marketer.utils.database.session_service import MarketDatabaseSessionService
@@ -27,8 +27,8 @@ db_host = "localhost"
 db_port = 3306
 db_name = "adk_sessions"
 
-# db_path = "sqlite:///database/adk-db.sqlite"
-db_path = f"{db_type}://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+db_path = "sqlite:///database/adk-db.sqlite"
+# db_path = f"{db_type}://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 session_service = MarketDatabaseSessionService(db_path)
 
 APP_NAME = "geo-project"
@@ -50,7 +50,7 @@ app.add_middleware(
 
 # Runner 초기화는 vertexai 초기화 후에
 runner = Runner(
-    agent=create_marketer_agent(),
+    agent=marketer_agent,
     app_name=APP_NAME,
     session_service=session_service,
 )

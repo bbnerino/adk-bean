@@ -10,20 +10,24 @@ from marketer.utils.mcp.load_web_tool import load_web_tool
 from marketer.utils.mcp.payment_agent import payment_agent_tool
 from marketer.utils.mcp.weather_agent import weather_agent
 
-root_agent = Agent(
-    model="gemini-2.5-flash",
-    name="root_agent",
-    description="A Marketing AI using the services of multiple sub-agents",
-    instruction=ROOT_AGENT_INSTR,
-    sub_agents=[
-        content_reviewer_agent,
-        content_writer_agent,
-        seo_optimizer_agent,
-        strategy_planner_agent,
-    ],
-    tools=[
-        load_web_tool,
-        payment_agent_tool,
-        weather_agent,
-    ],
-)
+
+def create_marketer_agent():
+
+    tools = [load_web_tool, payment_agent_tool, weather_agent]
+
+    return Agent(
+        model="gemini-2.5-flash",
+        name="marketer_agent",
+        description="A Marketing AI using the services of multiple sub-agents",
+        instruction=ROOT_AGENT_INSTR,
+        sub_agents=[
+            content_reviewer_agent,
+            content_writer_agent,
+            seo_optimizer_agent,
+            strategy_planner_agent,
+        ],
+        tools=tools,
+    )
+
+
+marketer_agent = create_marketer_agent()
