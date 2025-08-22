@@ -1,4 +1,5 @@
 from google.adk.agents import Agent
+from google.adk.tools.agent_tool import AgentTool
 from google_tools.sub_agents.deep_search.agent import deep_search_agent
 from google_tools.sub_agents.google_trend.agent import google_trend_agent
 
@@ -52,5 +53,6 @@ root_agent = Agent(
     name="google_tools_agent",
     description="A Google Tools AI using the services of multiple sub-agents",
     instruction=ROOT_AGENT_INSTR,
-    sub_agents=[google_trend_agent, deep_search_agent],
+    sub_agents=[google_trend_agent],
+    tools=[AgentTool(agent=deep_search_agent)],
 )

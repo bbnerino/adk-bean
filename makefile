@@ -11,7 +11,7 @@ install:
 
 # Web Tool MCP 서버 실행
 web:
-	uv run python mcp_server/load_web_tool.py
+	uv run adk web
 
 # 캐시 파일 정리
 clean:
